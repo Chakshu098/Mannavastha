@@ -165,32 +165,6 @@ export function SupportChat({ chatHistory, onSendMessage }: SupportChatProps) {
           </div>
         </div>
 
-        {/* Features Banner */}
-        <div className="bg-gradient-to-r from-brand-50 to-serenity-50 border-b border-elegant-100 p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              {features.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-3 p-4 bg-white/80 rounded-2xl border border-white/40 animate-scale-in hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center shadow-lg`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-elegant-900 text-sm mb-1">{feature.title}</h3>
-                      <p className="text-elegant-600 text-xs leading-relaxed">{feature.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
         {/* Main Voiceflow Container */}
         <div className="flex-1 relative overflow-hidden">
           {/* Loading State */}
