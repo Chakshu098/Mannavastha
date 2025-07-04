@@ -31,22 +31,18 @@ export function AICompanion() {
   }, [messages]);
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
-    // Check if OpenAI API key is available
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    // Use the DeepSeek API key you provided
+    const apiKey = 'sk-5e7f891ca3a242ea8cecd52c9c843fe1';
     
-    if (!apiKey) {
-      return "I'd love to chat with you, but it looks like the AI service isn't configured yet. 💙 In the meantime, know that your feelings are valid and you're not alone. Consider reaching out to a trusted friend, family member, or mental health professional if you need support.";
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: 'deepseek-chat',
           messages: [
             {
               role: 'system',
@@ -70,14 +66,13 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
           ],
           max_tokens: 200,
           temperature: 0.7,
-          presence_penalty: 0.1,
-          frequency_penalty: 0.1
+          stream: false
         })
       });
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Invalid API key - please check your OpenAI API configuration');
+          throw new Error('Invalid API key - please check your DeepSeek API configuration');
         } else if (response.status === 429) {
           throw new Error('API rate limit exceeded - please try again in a moment');
         } else {
@@ -88,7 +83,7 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
       const data = await response.json();
       return data.choices[0]?.message?.content || "I'm here for you, but I'm having trouble finding the right words right now. Could you tell me a bit more about how you're feeling?";
     } catch (error) {
-      console.error('Error calling OpenAI API:', error);
+      console.error('Error calling DeepSeek API:', error);
       
       // Provide specific error messages based on the error type
       if (error instanceof Error) {
@@ -210,7 +205,7 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold">Aira - Your AI Companion</h1>
-                  <p className="text-white/90 text-xs sm:text-sm">Powered by advanced AI • Here to listen and support 💙</p>
+                  <p className="text-white/90 text-xs sm:text-sm">Powered by DeepSeek AI • Here to listen and support 💙</p>
                 </div>
               </div>
               
