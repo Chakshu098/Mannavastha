@@ -73,6 +73,8 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Invalid API key - please check your DeepSeek API configuration');
+        } else if (response.status === 402) {
+          throw new Error('DeepSeek API billing issue - please check your account payment details');
         } else if (response.status === 429) {
           throw new Error('API rate limit exceeded - please try again in a moment');
         } else {
@@ -89,6 +91,8 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
       if (error instanceof Error) {
         if (error.message.includes('Invalid API key')) {
           return "I'm experiencing some configuration issues right now, but I want you to know that I'm here for you. 💙 Your feelings and experiences are always valid. While I work through these technical difficulties, please consider reaching out to a trusted friend or mental health professional if you need immediate support.";
+        } else if (error.message.includes('billing issue')) {
+          return "I'm experiencing some billing-related technical difficulties with my AI service right now, but I want you to know that I'm here for you in spirit. 💙 Your wellbeing matters deeply to me. While I work through these payment issues, please consider reaching out to a trusted friend, family member, or mental health professional if you need immediate support. You're not alone in this.";
         } else if (error.message.includes('rate limit')) {
           return "I'm getting a lot of requests right now and need a moment to catch up! 😊 Your message is important to me, so please try again in just a minute. In the meantime, take a deep breath - you're doing great by reaching out.";
         }
