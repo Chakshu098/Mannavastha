@@ -3,7 +3,6 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { MoodLogger } from './components/MoodLogger';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
-import { AICompanion } from './components/AICompanion';
 import { VideoConsult } from './components/VideoConsult';
 import { UserProfile } from './components/UserProfile';
 import { LoginPage } from './components/LoginPage';
@@ -193,8 +192,6 @@ function App() {
             moodEntries={moodEntries}
           />
         );
-      case 'chat':
-        return <AICompanion />;
       case 'video':
         return <VideoConsult />;
       case 'profile':
@@ -233,14 +230,9 @@ function App() {
       />
       
       <main className="relative z-10">
-        {/* Special handling for AI Companion tab */}
-        {activeTab === 'chat' ? (
-          renderActiveTab()
-        ) : (
-          <div className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            {renderActiveTab()}
-          </div>
-        )}
+        <div className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          {renderActiveTab()}
+        </div>
       </main>
     </div>
   );
