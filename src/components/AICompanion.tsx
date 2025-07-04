@@ -31,18 +31,15 @@ export function AICompanion() {
   }, [messages]);
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
-    // Use the DeepSeek API key you provided
-    const apiKey = 'sk-5e7f891ca3a242ea8cecd52c9c843fe1';
-    
     try {
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer sk-5e7f891ca3a242ea8cecd52c9c843fe1`
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
+          model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
@@ -66,39 +63,21 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
           ],
           max_tokens: 200,
           temperature: 0.7,
-          stream: false
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1
         })
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Invalid API key - please check your DeepSeek API configuration');
-        } else if (response.status === 402) {
-          throw new Error('DeepSeek API billing issue - please check your account payment details');
-        } else if (response.status === 429) {
-          throw new Error('API rate limit exceeded - please try again in a moment');
-        } else {
-          throw new Error(`API request failed with status ${response.status}`);
-        }
+        throw new Error(`API request failed: ${response.status}`);
       }
 
       const data = await response.json();
       return data.choices[0]?.message?.content || "I'm here for you, but I'm having trouble finding the right words right now. Could you tell me a bit more about how you're feeling?";
     } catch (error) {
-      console.error('Error calling DeepSeek API:', error);
+      console.error('Error calling OpenAI API:', error);
       
-      // Provide specific error messages based on the error type
-      if (error instanceof Error) {
-        if (error.message.includes('Invalid API key')) {
-          return "I'm experiencing some configuration issues right now, but I want you to know that I'm here for you. 💙 Your feelings and experiences are always valid. While I work through these technical difficulties, please consider reaching out to a trusted friend or mental health professional if you need immediate support.";
-        } else if (error.message.includes('billing issue')) {
-          return "I'm experiencing some billing-related technical difficulties with my AI service right now, but I want you to know that I'm here for you in spirit. 💙 Your wellbeing matters deeply to me. While I work through these payment issues, please consider reaching out to a trusted friend, family member, or mental health professional if you need immediate support. You're not alone in this.";
-        } else if (error.message.includes('rate limit')) {
-          return "I'm getting a lot of requests right now and need a moment to catch up! 😊 Your message is important to me, so please try again in just a minute. In the meantime, take a deep breath - you're doing great by reaching out.";
-        }
-      }
-      
-      // Fallback to empathetic response for other errors
+      // Fallback to empathetic response if API fails
       return "I'm experiencing some technical difficulties right now, but I want you to know that I'm here for you. 💙 Sometimes technology has hiccups, but your feelings and experiences are always valid. Would you like to try sharing again, or is there something specific I can help you with?";
     }
   };
@@ -209,7 +188,7 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold">Aira - Your AI Companion</h1>
-                  <p className="text-white/90 text-xs sm:text-sm">Powered by DeepSeek AI • Here to listen and support 💙</p>
+                  <p className="text-white/90 text-xs sm:text-sm">Powered by advanced AI • Here to listen and support 💙</p>
                 </div>
               </div>
               
