@@ -31,12 +31,19 @@ export function AICompanion() {
   }, [messages]);
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
+    // Check if OpenAI API key is available
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      return "I'd love to chat with you, but it looks like the AI service isn't configured yet. 💙 In the meantime, know that your feelings are valid and you're not alone. Consider reaching out to a trusted friend, family member, or mental health professional if you need support.";
+    }
+
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer sk-5e7f891ca3a242ea8cecd52c9c843fe1`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
@@ -69,7 +76,13 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        if (response.status === 401) {
+          throw new Error('Invalid API key - please check your OpenAI API configuration');
+        } else if (response.status === 429) {
+          throw new Error('API rate limit exceeded - please try again in a moment');
+        } else {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
       }
 
       const data = await response.json();
@@ -77,7 +90,16 @@ Remember: You're a supportive friend, not a therapist. Focus on emotional suppor
     } catch (error) {
       console.error('Error calling OpenAI API:', error);
       
-      // Fallback to empathetic response if API fails
+      // Provide specific error messages based on the error type
+      if (error instanceof Error) {
+        if (error.message.includes('Invalid API key')) {
+          return "I'm experiencing some configuration issues right now, but I want you to know that I'm here for you. 💙 Your feelings and experiences are always valid. While I work through these technical difficulties, please consider reaching out to a trusted friend or mental health professional if you need immediate support.";
+        } else if (error.message.includes('rate limit')) {
+          return "I'm getting a lot of requests right now and need a moment to catch up! 😊 Your message is important to me, so please try again in just a minute. In the meantime, take a deep breath - you're doing great by reaching out.";
+        }
+      }
+      
+      // Fallback to empathetic response for other errors
       return "I'm experiencing some technical difficulties right now, but I want you to know that I'm here for you. 💙 Sometimes technology has hiccups, but your feelings and experiences are always valid. Would you like to try sharing again, or is there something specific I can help you with?";
     }
   };
