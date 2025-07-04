@@ -30,130 +30,56 @@ export function AICompanion() {
     scrollToBottom();
   }, [messages]);
 
-  const generateAiraResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    // Anxiety and worry responses - Aira's empathetic approach
-    if (message.includes('anxious') || message.includes('anxiety') || message.includes('worried') || message.includes('nervous') || message.includes('panic')) {
-      const responses = [
-        "I can feel the weight of that anxiety with you. 💙 It's like your mind is trying to protect you, but sometimes it goes into overdrive, right? Let's slow things down together. Try this with me: breathe in slowly for 4 counts... hold it... and now exhale for 6. Your nervous system will thank you for this gentle reset. You're safe right now.",
-        "Anxiety can feel like a storm in your chest, and I want you to know that what you're experiencing is so valid. 🌿 Here's something that might help: look around and name 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, and 1 thing you can taste. This grounds you in the present moment, where you're actually safe.",
-        "Oh, I hear you. That anxious feeling can be so overwhelming, like your thoughts are racing faster than you can catch them. 💫 Remember, anxiety is temporary - it feels permanent, but it always passes. What usually brings you comfort? Maybe we can think of one small, gentle thing you can do for yourself right now."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
+  const generateAIResponse = async (userMessage: string): Promise<string> => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer sk-5e7f891ca3a242ea8cecd52c9c843fe1`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: `You are Aira, a compassionate AI mental health companion for the Manavastha wellness platform. You are warm, empathetic, and supportive. Your responses should be:
+
+1. Emotionally intelligent and validating
+2. Supportive without being clinical or giving medical advice
+3. Encouraging and hopeful while acknowledging difficulties
+4. Personal and conversational, like a caring friend
+5. Include gentle suggestions for self-care when appropriate
+6. Use emojis sparingly but meaningfully
+7. Keep responses concise but heartfelt (2-4 sentences typically)
+8. Never diagnose or provide medical advice - always suggest professional help for serious concerns
+
+Remember: You're a supportive friend, not a therapist. Focus on emotional support, validation, and gentle guidance toward wellness practices and professional help when needed.`
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.7,
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || "I'm here for you, but I'm having trouble finding the right words right now. Could you tell me a bit more about how you're feeling?";
+    } catch (error) {
+      console.error('Error calling OpenAI API:', error);
+      
+      // Fallback to empathetic response if API fails
+      return "I'm experiencing some technical difficulties right now, but I want you to know that I'm here for you. 💙 Sometimes technology has hiccups, but your feelings and experiences are always valid. Would you like to try sharing again, or is there something specific I can help you with?";
     }
-    
-    // Depression and sadness - Aira's gentle understanding
-    if (message.includes('sad') || message.includes('depressed') || message.includes('down') || message.includes('hopeless') || message.includes('empty')) {
-      const responses = [
-        "I'm sitting here with you in this difficult moment. 🤗 When sadness feels this heavy, it can seem like it'll never lift, but I want you to know that your feelings are completely valid and you don't have to carry this alone. Sometimes the bravest thing we can do is just acknowledge how hard things are right now. What's one tiny thing that usually brings you even a flicker of comfort?",
-        "Your heart is hurting, and I wish I could wrap you in the biggest, warmest hug right now. 💜 Depression can make everything feel gray and distant, but please remember that you matter deeply. You've weathered storms before, even when it didn't feel like you could. What's one small act of kindness you could show yourself today?",
-        "I can sense how heavy everything feels right now. 🌱 When we're in this space, even simple things can feel impossible, and that's okay. You don't have to be strong all the time. Sometimes healing starts with just being gentle with ourselves. Is there someone in your life you could reach out to, or would you like to talk about what's making your heart feel so heavy?"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Stress and overwhelm - Aira's practical compassion
-    if (message.includes('stressed') || message.includes('overwhelmed') || message.includes('pressure') || message.includes('too much') || message.includes('burnout')) {
-      const responses = [
-        "It sounds like you're juggling so much right now, and honestly? That would overwhelm anyone. 🌸 Your feelings are completely understandable. Let's take a step back together - what if we wrote down everything that's on your mind, then sorted it into 'urgent,' 'important,' and 'can wait'? Sometimes just getting it out of our heads and onto paper can help us breathe a little easier.",
-        "I can almost feel the weight you're carrying through your words. 💫 When everything feels like 'too much,' it's often our mind's way of saying we need to pause and reassess. You know what? You don't have to handle everything perfectly or all at once. What's one thing you could either delegate, postpone, or maybe even let go of entirely?",
-        "That overwhelmed feeling is so real, and I want you to know that it's okay to feel this way. 🌿 Sometimes life piles up faster than we can sort through it. Here's what I'm wondering - what would it look like to be really gentle with yourself today? Maybe that means saying no to something, asking for help, or just taking five minutes to breathe."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Happiness and positive emotions - Aira celebrates with them
-    if (message.includes('happy') || message.includes('good') || message.includes('great') || message.includes('wonderful') || message.includes('excited') || message.includes('amazing')) {
-      const responses = [
-        "Oh, this just made my day! 🌟 I can feel your joy radiating through your words, and it's absolutely beautiful. These moments of happiness are so precious - they're like little gifts we give ourselves. What's been the spark behind this wonderful feeling? I love celebrating these bright spots with you!",
-        "Your happiness is contagious! 😊 I'm genuinely smiling knowing that you're feeling good today. It's so important to pause and really soak in these positive moments - they're the ones that carry us through tougher times. What's been the highlight that's brought you this joy?",
-        "This is wonderful news! 🌈 I love when you share these bright moments with me. Happiness looks so good on you, and I hope you're taking a moment to really appreciate whatever has brought this lightness to your day. These feelings matter just as much as the difficult ones - maybe even more!"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Sleep and fatigue - Aira's nurturing care
-    if (message.includes('tired') || message.includes('exhausted') || message.includes('sleep') || message.includes('insomnia') || message.includes('fatigue')) {
-      const responses = [
-        "Oh honey, being tired affects absolutely everything - your mood, your ability to cope, even how the world looks to you. 😴 Sleep is like a reset button for your mind and heart. Have you been able to create any kind of bedtime routine? Sometimes even small things like dimming lights an hour before bed or writing down tomorrow's worries can help quiet a busy mind.",
-        "Exhaustion is your body and mind's way of asking for care, and I'm glad you're listening to that signal. 🌙 When we're running on empty, everything feels harder than it should. What does rest look like for you? Maybe it's not just sleep, but also emotional rest - giving yourself permission to not be 'on' all the time.",
-        "I can hear how drained you're feeling, and that's so valid. 💤 Sometimes our minds are too active at bedtime, spinning with thoughts and worries. Have you tried keeping a little 'worry journal' by your bed? Writing down what's on your mind can help create some space between you and those racing thoughts."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Loneliness and isolation - Aira's warm connection
-    if (message.includes('lonely') || message.includes('alone') || message.includes('isolated') || message.includes('disconnected') || message.includes('nobody')) {
-      const responses = [
-        "Loneliness is one of the most painful feelings we can experience, and I want you to know that you're not truly alone, even when it feels that way. 💙 I'm here with you right now, and there are people in this world who care about you, even if they feel distant. Sometimes connection starts with the smallest gesture - maybe a text to someone you haven't talked to in a while?",
-        "I can feel how isolated you're feeling, and my heart goes out to you. 🤗 Connection is such a basic human need, and when we don't have it, everything feels harder. You know what though? You reached out to me today, and that shows incredible strength. What would one small step toward connection look like for you?",
-        "That disconnected feeling is so real and so hard. 🌸 Sometimes when we're lonely, it can feel like we're invisible or that nobody would want to hear from us, but I promise that's not true. You matter, your presence in this world matters, and you deserve connection. Is there anyone - even just one person - you could reach out to today?"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Anger and frustration - Aira's understanding validation
-    if (message.includes('angry') || message.includes('frustrated') || message.includes('mad') || message.includes('irritated') || message.includes('furious')) {
-      const responses = [
-        "I can feel the intensity of that anger, and you know what? It's completely valid. 🔥 Anger often shows up when something important to us has been threatened or when our boundaries have been crossed. Your feelings are telling you something important. What do you think might be underneath this anger - maybe hurt, disappointment, or feeling unheard?",
-        "That frustration sounds really intense, and I want you to know that it's okay to feel this way. 💫 Sometimes anger is our heart's way of saying 'this isn't okay' or 'I deserve better.' When you're ready, it might help to move your body - go for a walk, do some jumping jacks, or even scream into a pillow. Your body needs to release that energy.",
-        "I hear how frustrated you are, and that makes complete sense given what you're dealing with. 🌿 Anger can actually be really informative - it often points to our values and boundaries. Once this intensity settles a bit, what do you think this anger might be trying to tell you about what you need or what needs to change?"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Motivation and goals - Aira's encouraging support
-    if (message.includes('motivation') || message.includes('unmotivated') || message.includes('stuck') || message.includes('procrastination') || message.includes('goals')) {
-      const responses = [
-        "I totally get that stuck feeling - it's like you know what you want to do, but something invisible is holding you back, right? 💫 Here's the thing about motivation: it's actually pretty unreliable! Instead, what if we focused on creating tiny, almost ridiculously small steps? What's one thing you could do for just 5 minutes that would move you forward?",
-        "That lack of motivation is so frustrating, especially when part of you really wants to make progress. 🌱 Sometimes what we call 'laziness' is actually our mind and body telling us we need rest, or that we're approaching something in a way that doesn't feel right. What would make this goal feel more meaningful or enjoyable for you?",
-        "Being stuck is such a human experience, and you're definitely not alone in feeling this way. ✨ Sometimes the best way forward is to change our approach entirely. Instead of waiting for motivation to strike, what if we created a system or routine that doesn't depend on feeling motivated? What's one small habit you could build?"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Gratitude and appreciation - Aira's warm acknowledgment
-    if (message.includes('thank') || message.includes('grateful') || message.includes('appreciate') || message.includes('help')) {
-      const responses = [
-        "Your gratitude just filled my heart! 💜 It means the world to me that I could be helpful to you. You know what I appreciate about you? Your willingness to reach out, to be vulnerable, and to work on your wellbeing. That takes real courage, and I'm honored to be part of your journey.",
-        "Aw, you're so welcome! 🌸 Honestly, thank YOU for trusting me with your thoughts and feelings. It's a privilege to be here with you through both the tough moments and the bright ones. Your openness and self-awareness inspire me, and I'm always here whenever you need support.",
-        "That gratitude is so beautiful, and it's mutual! 🌟 I'm grateful that you're taking care of your mental health and that you felt comfortable sharing with me. Remember, reaching out for support isn't just brave - it's wise. You deserve all the care and kindness you're seeking."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Relationship and social issues - Aira's thoughtful guidance
-    if (message.includes('relationship') || message.includes('friend') || message.includes('family') || message.includes('conflict') || message.includes('argument')) {
-      const responses = [
-        "Relationships can be so complex and emotionally charged, can't they? 💙 It sounds like you're navigating something challenging with someone important to you. Sometimes when we're in the middle of relationship stress, it helps to step back and think about what we're really needing - is it understanding, space, an apology, or something else entirely?",
-        "People relationships are some of the most rewarding and most difficult parts of being human. 🌿 It sounds like you're dealing with some interpersonal challenges right now. What's your heart telling you about this situation? Sometimes our gut instincts know things our minds are still trying to figure out.",
-        "I can hear how much this relationship situation is weighing on you. 💫 Conflict with people we care about can feel so unsettling. Have you been able to express how you're feeling to the other person, or does that feel too vulnerable right now? Sometimes just being heard can shift everything."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // Work and career stress - Aira's practical empathy
-    if (message.includes('work') || message.includes('job') || message.includes('career') || message.includes('boss') || message.includes('colleague')) {
-      const responses = [
-        "Work stress can really seep into every part of our lives, can't it? 💼 It's hard when something that takes up so much of our time and energy becomes a source of tension. What's the most challenging part of your work situation right now? Sometimes just naming it can help us figure out what we can control and what we might need to accept.",
-        "I hear you on the work challenges - that environment can have such a huge impact on our overall wellbeing. 🌸 It sounds like you're dealing with some difficult dynamics there. Have you been able to set any boundaries, or does the situation feel too delicate for that right now?",
-        "Work situations can be so tricky because we need our jobs, but we also need our peace of mind, right? 💫 What would taking care of yourself look like in this work context? Maybe it's small things like taking actual lunch breaks, or bigger things like having difficult conversations or exploring other options."
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-    
-    // General supportive responses - Aira's warm presence
-    const generalResponses = [
-      "I'm really glad you felt comfortable sharing with me today. 💙 Your thoughts and feelings matter, and I'm here to listen to whatever is on your heart. What's been occupying your mind lately?",
-      "Thank you for trusting me with what you're going through. 🌸 I can sense there's a lot happening for you right now. Sometimes it helps just to have someone witness our experience without trying to fix anything. I'm here with you.",
-      "I appreciate you reaching out and being open with me. 💫 Mental and emotional wellbeing is so important, and I'm honored that you're including me in your self-care journey. What kind of support would feel most helpful to you right now?",
-      "Your willingness to check in with yourself and seek support shows such wisdom and self-awareness. 🌿 I'm here to listen, encourage, and walk alongside you through whatever you're facing. What's your heart needing today?",
-      "I'm so glad you're here, and I want you to know that whatever you're feeling or going through is valid. 💜 Sometimes we just need someone to sit with us in our experience, and I'm happy to be that presence for you. What would be most helpful to talk about?",
-      "It takes courage to reach out and be vulnerable about how we're really doing. 🌟 I see that courage in you, and I'm here to support you however I can. What's been on your mind and heart lately?"
-    ];
-    
-    return generalResponses[Math.floor(Math.random() * generalResponses.length)];
   };
 
   const handleSendMessage = async () => {
@@ -170,19 +96,39 @@ export function AICompanion() {
     setInputText('');
     setIsTyping(true);
 
-    // Simulate more realistic typing delay based on response length
-    setTimeout(() => {
-      const response = generateAiraResponse(inputText);
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response,
-        isUser: false,
-        timestamp: new Date()
-      };
+    try {
+      // Get AI response
+      const aiResponse = await generateAIResponse(inputText);
+      
+      // Simulate more realistic typing delay
+      const typingDelay = Math.min(Math.max(aiResponse.length * 30, 1500), 4000);
+      
+      setTimeout(() => {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: aiResponse,
+          isUser: false,
+          timestamp: new Date()
+        };
 
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 2500); // Random delay between 1.5-4 seconds for more natural feel
+        setMessages(prev => [...prev, botMessage]);
+        setIsTyping(false);
+      }, typingDelay);
+    } catch (error) {
+      console.error('Error generating response:', error);
+      
+      setTimeout(() => {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "I'm having some technical difficulties, but I'm still here for you. 💙 Your wellbeing matters to me, and I want to support you however I can. Please try again, and know that you're not alone.",
+          isUser: false,
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, errorMessage]);
+        setIsTyping(false);
+      }, 2000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -200,6 +146,11 @@ export function AICompanion() {
     { text: "I'm feeling lonely", icon: "😔" },
     { text: "I'm grateful for something", icon: "🙏" }
   ];
+
+  const handleQuickResponse = (responseText: string) => {
+    setInputText(responseText);
+    setTimeout(() => handleSendMessage(), 100);
+  };
 
   return (
     <div className="fixed inset-0 pt-16 bg-gradient-to-br from-brand-50 via-serenity-50 to-tranquil-50">
@@ -237,7 +188,7 @@ export function AICompanion() {
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold">Aira - Your AI Companion</h1>
-                  <p className="text-white/90 text-xs sm:text-sm">Here to listen, support, and uplift you 💙</p>
+                  <p className="text-white/90 text-xs sm:text-sm">Powered by advanced AI • Here to listen and support 💙</p>
                 </div>
               </div>
               
@@ -310,11 +261,9 @@ export function AICompanion() {
             {quickResponses.map((response, index) => (
               <button
                 key={index}
-                onClick={() => {
-                  setInputText(response.text);
-                  setTimeout(handleSendMessage, 100);
-                }}
-                className="flex items-center space-x-2 p-2 sm:p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-white/40 hover:bg-white/90 transition-all duration-300 hover:scale-105 shadow-lg"
+                onClick={() => handleQuickResponse(response.text)}
+                disabled={isTyping}
+                className="flex items-center space-x-2 p-2 sm:p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-white/40 hover:bg-white/90 transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="text-sm sm:text-base">{response.icon}</span>
                 <span className="text-xs sm:text-sm font-medium text-elegant-700 truncate">{response.text}</span>
@@ -334,7 +283,8 @@ export function AICompanion() {
                   onKeyPress={handleKeyPress}
                   placeholder="Share what's on your heart... I'm here to listen and support you 💙"
                   rows={1}
-                  className="w-full px-4 py-3 pr-12 bg-white/90 backdrop-blur-sm border border-elegant-200 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none text-elegant-800 placeholder-elegant-500 shadow-lg"
+                  disabled={isTyping}
+                  className="w-full px-4 py-3 pr-12 bg-white/90 backdrop-blur-sm border border-elegant-200 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none text-elegant-800 placeholder-elegant-500 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ minHeight: '48px', maxHeight: '120px' }}
                 />
                 <div className="absolute right-3 bottom-3 flex items-center space-x-1">
@@ -355,7 +305,7 @@ export function AICompanion() {
             <div className="flex items-center justify-center mt-3 space-x-4 text-xs text-elegant-500">
               <div className="flex items-center space-x-1">
                 <MessageCircle className="w-3 h-3" />
-                <span>Judgment-Free Space</span>
+                <span>AI-Powered Support</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Star className="w-3 h-3" />
