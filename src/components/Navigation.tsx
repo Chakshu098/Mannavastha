@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, TrendingUp, Brain, MessageCircle, User, Menu, X, Video } from 'lucide-react';
+import { Home, TrendingUp, Brain, User, Menu, X, Video } from 'lucide-react';
 
 interface NavigationProps {
   activeTab: string;
@@ -13,7 +13,6 @@ export function Navigation({ activeTab, onTabChange, isMobileMenuOpen, setIsMobi
     { id: 'dashboard', label: 'Wellness Hub', icon: Home, gradient: 'from-brand-500 to-serenity-500' },
     { id: 'mood', label: 'Mood Tracker', icon: TrendingUp, gradient: 'from-serenity-500 to-tranquil-500' },
     { id: 'exercises', label: 'Wellness Studio', icon: Brain, gradient: 'from-tranquil-500 to-brand-500' },
-    { id: 'chat', label: 'AI Companions', icon: MessageCircle, gradient: 'from-brand-500 to-vitality-500' },
     { id: 'video', label: 'Video Consult', icon: Video, gradient: 'from-vitality-500 to-mindful-500' },
     { id: 'profile', label: 'My Journey', icon: User, gradient: 'from-serenity-500 to-brand-500' },
   ];

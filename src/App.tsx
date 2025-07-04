@@ -3,14 +3,12 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { MoodLogger } from './components/MoodLogger';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
-import { SupportChat } from './components/SupportChat';
 import { VideoConsult } from './components/VideoConsult';
 import { UserProfile } from './components/UserProfile';
 import { LoginPage } from './components/LoginPage';
 import { IntroPage } from './components/IntroPage';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { MoodEntry, ExerciseCompletion, ChatMessage } from './types';
-import { generateAIResponse, getAgentType, calculateConfidenceScore } from './utils/aiResponses';
+import { MoodEntry, ExerciseCompletion } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -21,7 +19,6 @@ function App() {
   // Data storage using localStorage
   const [moodEntries, setMoodEntries] = useLocalStorage<MoodEntry[]>('manavastha-mood-entries', []);
   const [exerciseCompletions, setExerciseCompletions] = useLocalStorage<ExerciseCompletion[]>('manavastha-exercise-completions', []);
-  const [chatHistory, setChatHistory] = useLocalStorage<ChatMessage[]>('manavastha-chat-history', []);
 
   // Close mobile menu when tab changes
   useEffect(() => {
@@ -101,29 +98,10 @@ function App() {
     }, 3000);
   };
 
-  const handleSendMessage = (message: string) => {
-    const response = generateAIResponse(message);
-    const agentType = getAgentType(message);
-    const confidenceScore = calculateConfidenceScore(message);
-    
-    const chatMessage: ChatMessage = {
-      id: Date.now().toString(),
-      user_id: 'local-user',
-      message,
-      response,
-      created_at: new Date().toISOString(),
-      agent_type: agentType,
-      confidence_score: confidenceScore
-    };
-    
-    setChatHistory(prev => [...prev, chatMessage]);
-  };
-
   const handleClearData = () => {
     if (window.confirm('Are you sure you want to clear all your wellness data? This action cannot be undone.')) {
       setMoodEntries([]);
       setExerciseCompletions([]);
-      setChatHistory([]);
       
       const notification = document.createElement('div');
       notification.className = 'fixed top-20 right-4 bg-gradient-to-r from-vitality-500 to-mindful-500 text-white px-6 py-3 rounded-2xl shadow-xl z-50 animate-slide-down';
@@ -156,7 +134,6 @@ function App() {
     const data = {
       moodEntries,
       exerciseCompletions,
-      chatHistory,
       exportDate: new Date().toISOString(),
       platform: 'Manavastha AI Wellness Platform'
     };
@@ -215,13 +192,6 @@ function App() {
             moodEntries={moodEntries}
           />
         );
-      case 'chat':
-        return (
-          <SupportChat 
-            chatHistory={chatHistory}
-            onSendMessage={handleSendMessage}
-          />
-        );
       case 'video':
         return <VideoConsult />;
       case 'profile':
@@ -260,14 +230,9 @@ function App() {
       />
       
       <main className="relative z-10">
-        {/* Only apply padding for non-chat tabs */}
-        {activeTab === 'chat' ? (
-          renderActiveTab()
-        ) : (
-          <div className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            {renderActiveTab()}
-          </div>
-        )}
+        <div className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          {renderActiveTab()}
+        </div>
       </main>
     </div>
   );
