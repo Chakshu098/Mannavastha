@@ -17,11 +17,7 @@ _____
   
     📁 Project Structure
 
-    🎨 Design System
-
     🔧 Development Guidelines
-
-    📱 Responsive Design
 
     🔒 Security & Privacy
 
@@ -179,5 +175,37 @@ Project Structure
     │
     └── eslint.config.js         # ESLint setup for code quality and linting
 
+
+___
+
+
+ 🔧 Development Guidelines
+
+    💬 Use ChatMessage type for AI/user messages
+
+    🔁 Keep all API calls inside lib/actions.ts
+
+    📦 Group all UI components inside /components/ui
+
+    🧪 Follow commit style: feat:, fix:, refactor:, chore:
+
+    🔒 Never hardcode API keys — use .env.local
+
+
+___
+
+
+🔒 Security & Privacy
+
+
+    🔐 JWT-based authentication via Supabase
+
+    🧠 User input never stored unless explicitly opted in
+
+    📦 Rate-limiting for AI queries
+
+    🫶 Mental health data shown only in private reports
+
+    ✅ GDPR-safe and privacy-first practices used
 
 
